@@ -3,15 +3,17 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { formatDistanceToNow } from "date-fns"
-import { ArrowUpRight, CheckCircle, Clock, Coins, FileText } from "lucide-react"
+import { ArrowUpRight, CheckCircle, Clock, Coins, FileText, XCircle } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { fetchTransactions } from "@/lib/blockchain-service"
+import TransactionDetails from "@/components/transaction-details"
 
 export default function TransactionList({ isLoading, latestBlock }) {
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
+  const [selectedTx, setSelectedTx] = useState(null)
 
   useEffect(() => {
     if (!isLoading && latestBlock) {
@@ -45,7 +47,7 @@ export default function TransactionList({ isLoading, latestBlock }) {
   }
 
   const getRandomTxType = () => {
-    const types = ["transfer", "contract", "token"]
+    const types = ["transfer", "contract", "token", "swap", "mint", "burn"]
     return types[Math.floor(Math.random() * types.length)]
   }
 
@@ -70,8 +72,33 @@ export default function TransactionList({ isLoading, latestBlock }) {
         return "Contract call"
       case "token":
         return "Token transfer"
+      case "swap":
+        return "Token swap"
+      case "mint":
+        return "Token mint"
+      case "burn":
+        return "Token burn"
       default:
         return "Transaction"
+    }
+  }
+
+  const getTxTypeBadge = (type) => {
+    switch (type) {
+      case "transfer":
+        return "transfer"
+      case "contract":
+        return "info"
+      case "token":
+        return "warning"
+      case "swap":
+        return "evm"
+      case "mint":
+        return "success"
+      case "burn":
+        return "destructive"
+      default:
+        return "secondary"
     }
   }
 
@@ -89,6 +116,7 @@ export default function TransactionList({ isLoading, latestBlock }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
+                onClick={() => setSelectedTx(tx)}
               >
                 <Card className="bg-card/50 backdrop-blur-sm border-border p-4 hover:bg-card/80 transition-all cursor-pointer group">
                   <div className="flex items-center justify-between">
@@ -99,18 +127,38 @@ export default function TransactionList({ isLoading, latestBlock }) {
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="font-light text-lg tracking-tight">{truncateAddress(tx.hash)}</h3>
-                          <Badge variant={tx.status === "success" ? "outline" : "destructive"} className="h-5 px-1.5">
+                          <Badge variant={tx.status === "success" ? "success" : "failed"} className="h-5 px-1.5">
                             <div className="flex items-center gap-1 text-xs">
-                              {tx.status === "success" && <CheckCircle className="h-3 w-3" />}
+                              {tx.status === "success" ? (
+                                <CheckCircle className="h-3 w-3" />
+                              ) : (
+                                <XCircle className="h-3 w-3" />
+                              )}
                               {tx.status === "success" ? "Success" : "Failed"}
                             </div>
                           </Badge>
-                          <Badge variant="secondary" className="h-5 px-1.5">
+                          <Badge variant={getTxTypeBadge(tx.type)} className="h-5 px-1.5">
                             <div className="flex items-center gap-1 text-xs">
                               {getTxTypeIcon(tx.type)}
                               {getTxTypeLabel(tx.type)}
                             </div>
                           </Badge>
+                          {tx.type === "transfer" && (
+                            <Badge variant="transfer" className="h-5 px-1.5">
+                              <div className="flex items-center gap-1 text-xs">
+                                <ArrowUpRight className="h-3 w-3" />
+                                Transfer
+                              </div>
+                            </Badge>
+                          )}
+                          {tx.type === "token" && (
+                            <Badge variant="info" className="h-5 px-1.5">
+                              <div className="flex items-center gap-1 text-xs">
+                                <Coins className="h-3 w-3" />
+                                Token
+                              </div>
+                            </Badge>
+                          )}
                         </div>
                         <div className="flex items-center gap-4 text-xs text-muted-foreground/70 mt-1">
                           <div className="flex items-center gap-1">
@@ -131,6 +179,8 @@ export default function TransactionList({ isLoading, latestBlock }) {
               </motion.div>
             ))}
       </AnimatePresence>
+
+      {selectedTx && <TransactionDetails tx={selectedTx} onClose={() => setSelectedTx(null)} />}
     </div>
   )
 }

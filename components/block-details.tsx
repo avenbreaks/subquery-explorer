@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { X } from 'lucide-react'
+import { X } from "lucide-react"
 import { format } from "date-fns"
 import { fetchBlockByNumber } from "@/lib/blockchain-service"
 
@@ -12,43 +12,43 @@ export default function BlockDetails({ blockNumber, onClose }) {
 
   // Format gas price
   const formatGasPrice = (gasPrice) => {
-    if (!gasPrice) return "0 Gwei";
-    
+    if (!gasPrice) return "0 Gwei"
+
     // Convert to Gwei (1 Gwei = 10^9 Wei)
-    const gweiValue = gasPrice / 1e9;
-    
+    const gweiValue = gasPrice / 1e9
+
     // Format based on the value
     if (gweiValue < 0.01) {
-      return `${(gweiValue * 1000).toFixed(2)} MGwei`;
+      return `${(gweiValue * 1000).toFixed(2)} MGwei`
     } else if (gweiValue >= 1000) {
-      return `${(gweiValue / 1000).toFixed(2)} KGwei`;
+      return `${(gweiValue / 1000).toFixed(2)} KGwei`
     } else {
-      return `${gweiValue.toFixed(2)} Gwei`;
+      return `${gweiValue.toFixed(2)} Gwei`
     }
   }
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
-        const data = await fetchBlockByNumber(blockNumber, true);
-        
+        setLoading(true)
+        const data = await fetchBlockByNumber(blockNumber, true)
+
         // Also fetch gas price for this block if needed
         // const gasPrice = await fetchGasPrice();
-        
+
         setBlockData({
           ...data,
           // gasPrice
-        });
+        })
       } catch (error) {
-        console.error("Error fetching block details:", error);
+        console.error("Error fetching block details:", error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchData();
-  }, [blockNumber]);
+    fetchData()
+  }, [blockNumber])
 
   // Format timestamp to date string
   const formatTimestamp = (timestamp) => {

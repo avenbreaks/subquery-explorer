@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { formatDistanceToNow } from "date-fns"
-import { Clock } from "lucide-react"
+import { CheckCircle, Clock } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
@@ -32,7 +32,7 @@ export default function BlockList({ isLoading, latestBlock, totalBlocks, onBlock
   }
 
   return (
-    <div className="space-y-4 max-w-3xl mx-auto">
+    <div className="space-y-4 max-w-9xl mx-auto">
       <AnimatePresence mode="popLayout">
         {loading || isLoading
           ? Array(5)
@@ -65,6 +65,12 @@ export default function BlockList({ isLoading, latestBlock, totalBlocks, onBlock
                               <div className="flex items-center gap-1 text-xs">Latest</div>
                             </Badge>
                           )}
+                          <Badge variant="success" className="h-5 px-1.5">
+                            <div className="flex items-center gap-1 text-xs">
+                              <CheckCircle className="h-3 w-3" />
+                              Validated
+                            </div>
+                          </Badge>
                         </div>
                         <div className="flex items-center gap-4 text-xs text-muted-foreground/70 mt-1">
                           <div className="flex items-center gap-1">
