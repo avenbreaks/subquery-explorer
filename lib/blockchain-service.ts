@@ -141,21 +141,21 @@ export async function fetchBlockchainData() {
   // Fetch total blocks (latest block number)
   const blockNumberHex = await jsonRpcCall("eth_blockNumber")
   const totalBlocks = hexToNumber(blockNumberHex)
-  
+
   // Fetch latest block with transactions
   const latestBlock = await fetchLatestBlock()
-  
+
   // Calculate average block time
   const averageBlockTime = await calculateAverageBlockTime(totalBlocks)
-  
+
   // Fetch gas price
   const gasPrice = await fetchGasPrice()
   console.log("Converted gas price:", gasPrice)
-  
+
   // Calculate total transactions (this is an estimate based on latest block)
   // In a real explorer, you'd have a database with the actual count
   const totalTransactions = latestBlock.number * (latestBlock.transactions.length || 10)
-  
+
   return {
     latestBlock,
     totalBlocks,
