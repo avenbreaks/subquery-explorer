@@ -1,7 +1,7 @@
 // RPC endpoint for CoinEx Smart Chain
-const RPC_URL = "https://rpc.coinex.net"
-const CHAIN_ID = 52
-const SYMBOL = "CET"
+const RPC_URL = "https://rpc-data.oorthnexus.xyz"
+const CHAIN_ID = 982025
+const SYMBOL = "OXT"
 
 // Helper function to make JSON-RPC calls
 async function jsonRpcCall(method: string, params: any[] = []) {
@@ -156,12 +156,29 @@ export async function fetchBlockchainData() {
   // In a real explorer, you'd have a database with the actual count
   const totalTransactions = latestBlock.number * (latestBlock.transactions.length || 10)
 
+  // Fetch stats from explorer API
+  let totalAddresses = 0
+  try {
+    const statsResponse = await fetch("https://explorer.oorthnexus.xyz/api/v2/stats", {
+      headers: {
+        "accept": "application/json",
+      },
+    })
+    if (statsResponse.ok) {
+      const stats = await statsResponse.json()
+      totalAddresses = Number.parseInt(stats.total_addresses) || 0
+    }
+  } catch (error) {
+    console.error("Error fetching stats:", error)
+  }
+
   return {
     latestBlock,
     totalBlocks,
     totalTransactions,
     averageBlockTime,
     gasPrice,
+    totalAddresses,
   }
 }
 

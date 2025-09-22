@@ -49,14 +49,14 @@ export function ValidatorsCard({ isLoading }: ValidatorsCardProps) {
             <div className="flex flex-row justify-between">
               <Circle ref={ethereumRef}>
                 <img
-                  src="https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=040"
+                  src="/images/genetic.svg"
                   alt="Ethereum Logo"
                   className="h-full w-full"
                 />
               </Circle>
               <Circle ref={solanaRef}>
                 <img
-                  src="https://cryptologos.cc/logos/solana-sol-logo.svg?v=024"
+                  src="/images/genetic-engine.svg"
                   alt="Solana Logo"
                   className="h-full w-full"
                 />

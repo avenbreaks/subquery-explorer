@@ -11,9 +11,9 @@ import { Tabs } from "@/components/ui/tabs"
 import type React from "react"
 
 import { useEffect, useState } from "react"
+import dynamic from "next/dynamic"
 import { Activity, Clock, Database, Layers, RefreshCw, Search, Users } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { GeometricLines } from "@/components/geometric-lines"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { StatsCard } from "@/components/stats/stats-card"
 import { ValidatorsCard } from "@/components/stats/validators-card"
@@ -21,10 +21,24 @@ import BlockList from "@/components/block-list"
 import TransactionList from "@/components/transaction-list"
 import BlockDetails from "@/components/block-details"
 import NetworkStats from "@/components/network-stats"
-import PriceTracker from "@/components/price-tracker"
 import NetworkHeader from "@/components/network-header"
 import { fetchBlockchainData } from "@/lib/blockchain-service"
 import { formatGasPrice } from "@/lib/utils/format"
+
+// Dynamically import client-only components to avoid hydration issues
+const GeometricLines = dynamic(() => import("@/components/geometric-lines").then(mod => ({ default: mod.GeometricLines })), {
+  ssr: false,
+})
+
+const PriceTracker = dynamic(() => import("@/components/price-tracker"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-border">
+      <span className="font-medium text-sm">ADR</span>
+      <span className="text-sm">Loading...</span>
+    </div>
+  ),
+})
 
 // Types for blockchain data
 interface BlockchainData {
@@ -33,6 +47,7 @@ interface BlockchainData {
   totalTransactions: number
   averageBlockTime: number
   gasPrice: number
+  totalAddresses: number
   isLoading: boolean
 }
 
@@ -44,6 +59,7 @@ export default function BlockchainExplorer() {
     totalTransactions: 0,
     averageBlockTime: 0,
     gasPrice: 0,
+    totalAddresses: 0,
     isLoading: true,
   })
   const [refreshing, setRefreshing] = useState(false)
@@ -167,7 +183,7 @@ export default function BlockchainExplorer() {
             <ValidatorsCard isLoading={data.isLoading} />
             <StatsCard
               title="Total Addresses"
-              value="1.2M+"
+              value={data.isLoading ? null : data.totalAddresses.toLocaleString()}
               description="Unique addresses"
               icon={<Users className="h-5 w-5" />}
               isLoading={data.isLoading}

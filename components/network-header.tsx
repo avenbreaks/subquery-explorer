@@ -8,7 +8,7 @@ export default function NetworkHeader({ data }) {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
           <img
-            src="https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=040"
+            src="/wlogo.png"
             alt="Ethereum Logo"
             className="h-10 w-10"
           />

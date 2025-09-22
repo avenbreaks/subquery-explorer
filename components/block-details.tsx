@@ -6,12 +6,31 @@ import { X } from "lucide-react"
 import { format } from "date-fns"
 import { fetchBlockByNumber } from "@/lib/blockchain-service"
 
-export default function BlockDetails({ blockNumber, onClose }) {
-  const [blockData, setBlockData] = useState(null)
+interface BlockData {
+  number: number
+  timestamp: number
+  transactions: any[]
+  miner: string
+  size: number
+  gasUsed: number
+  gasLimit: number
+  hash: string
+  parentHash: string
+  nonce: string
+  extraData: string
+}
+
+interface BlockDetailsProps {
+  blockNumber: number
+  onClose: () => void
+}
+
+export default function BlockDetails({ blockNumber, onClose }: BlockDetailsProps) {
+  const [blockData, setBlockData] = useState<BlockData | null>(null)
   const [loading, setLoading] = useState(true)
 
   // Format gas price
-  const formatGasPrice = (gasPrice) => {
+  const formatGasPrice = (gasPrice: number | null | undefined): string => {
     if (!gasPrice) return "0 Gwei"
 
     // Convert to Gwei (1 Gwei = 10^9 Wei)
@@ -39,7 +58,7 @@ export default function BlockDetails({ blockNumber, onClose }) {
         setBlockData({
           ...data,
           // gasPrice
-        })
+        } as BlockData)
       } catch (error) {
         console.error("Error fetching block details:", error)
       } finally {
@@ -51,19 +70,19 @@ export default function BlockDetails({ blockNumber, onClose }) {
   }, [blockNumber])
 
   // Format timestamp to date string
-  const formatTimestamp = (timestamp) => {
+  const formatTimestamp = (timestamp: number | null | undefined): string => {
     if (!timestamp) return ""
     const date = new Date(timestamp * 1000)
     return format(date, "yyyy-MM-dd HH:mm:ss 'UTC+7'")
   }
 
   // Format bytes with unit
-  const formatBytes = (bytes) => {
+  const formatBytes = (bytes: number): string => {
     return `${bytes} bytes`
   }
 
   // Format gas percentage
-  const formatGasPercentage = (used, limit) => {
+  const formatGasPercentage = (used: number | null | undefined, limit: number | null | undefined): string => {
     if (!used || !limit) return "0 (0%)"
     const percentage = (used / limit) * 100
     return `${used.toLocaleString()} (${percentage.toFixed(2)}%)`
@@ -141,7 +160,7 @@ export default function BlockDetails({ blockNumber, onClose }) {
   )
 }
 
-function BlockInfoRow({ label, value, isHash = false, isAddress = false, isLongText = false }) {
+function BlockInfoRow({ label, value, isHash = false, isAddress = false, isLongText = false }: { label: string; value: string | number; isHash?: boolean; isAddress?: boolean; isLongText?: boolean }) {
   return (
     <tr className="border-b last:border-b-0">
       <td className="py-4 pr-4 align-top text-muted-foreground font-medium w-1/4">{label}</td>
@@ -158,9 +177,9 @@ function BlockInfoRow({ label, value, isHash = false, isAddress = false, isLongT
   )
 }
 
-function formatDistanceToNow(date) {
+function formatDistanceToNow(date: Date): string {
   const now = new Date()
-  const diffInSeconds = Math.floor((now - date) / 1000)
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
 
   if (diffInSeconds < 60) {
     return `${diffInSeconds} secs`
